@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgentNet Help Centre UX Prototype</title>
+  <meta name="description" content="A reimagined AgentNet Help Centre prototype with action-first article experiences." />
+  <style>
+    :root {
+      --red:#e32726;
+      --red-dark:#c81718;
+      --ink:#0f172a;
+      --muted:#64748b;
+      --line:#e2e8f0;
+      --soft:#f7f7f5;
+      --soft-red:#fff1f1;
+      --green:#059669;
+      --amber:#d97706;
+      --dark:#020617;
+      --radius:28px;
+      --shadow: 0 18px 45px rgba(15, 23, 42, .08);
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:var(--ink); background:var(--soft); }
+    button, input { font: inherit; }
+    button { cursor:pointer; }
+    img { max-width:100%; display:block; }
+    .app-header { position:sticky; top:0; z-index:50; background:rgba(255,255,255,.92); backdrop-filter: blur(16px); border-bottom:1px solid var(--line); }
+    .wrap { max-width:1240px; margin:0 auto; padding:0 24px; }
+    .topbar { min-height:70px; display:flex; align-items:center; gap:22px; justify-content:space-between; }
+    .brand { display:flex; align-items:center; gap:12px; background:none; border:0; color:inherit; text-align:left; padding:0; min-width:245px; }
+    .logo { width:42px; height:42px; border-radius:17px; background:var(--red); color:#fff; display:grid; place-items:center; font-weight:900; box-shadow:0 12px 28px rgba(227,39,38,.22); }
+    .brand-title { font-weight:900; font-size:14px; line-height:1; }
+    .brand-sub { color:var(--muted); font-size:12px; font-weight:650; margin-top:5px; }
+    .searchbar { flex:1; max-width:540px; display:flex; align-items:center; gap:10px; padding:12px 16px; border-radius:999px; border:1px solid var(--line); background:#f8fafc; color:var(--muted); font-size:14px; font-weight:700; }
+    .main-nav { display:flex; align-items:center; gap:20px; color:#475569; font-weight:900; font-size:14px; white-space:nowrap; }
+    .main-nav button { background:none; border:0; color:inherit; font-weight:900; padding:8px 0; }
+    .main-nav button:hover, .main-nav .active { color:var(--red); }
+    .login-btn, .primary { border:0; background:var(--red); color:#fff; font-weight:900; padding:14px 22px; border-radius:18px; box-shadow:0 12px 28px rgba(227,39,38,.2); transition:.2s ease; }
+    .login-btn { background:var(--dark); box-shadow:none; border-radius:999px; padding:11px 20px; }
+    .secondary { border:1px solid var(--line); background:#fff; color:var(--ink); font-weight:900; padding:14px 22px; border-radius:18px; }
+    .primary:hover, .secondary:hover, .login-btn:hover, .card:hover { transform: translateY(-2px); }
+    .mobile-search { display:none; padding:12px 24px; border-top:1px solid #f1f5f9; }
+    .section { padding:72px 0; }
+    .section.white { background:#fff; }
+    .section.dark { background:var(--dark); color:#fff; }
+    .hero { position:relative; overflow:hidden; background:#fff; }
+    .hero:before, .hero:after { content:""; position:absolute; border-radius:999px; filter:blur(60px); pointer-events:none; }
+    .hero:before { width:340px; height:340px; background:#fee2e2; left:-140px; top:-150px; }
+    .hero:after { width:420px; height:420px; background:#f1f5f9; right:-150px; bottom:-170px; }
+    .hero-grid { position:relative; z-index:1; display:grid; grid-template-columns:1.04fr .96fr; gap:52px; align-items:center; padding:72px 0; }
+    .pill { display:inline-flex; gap:8px; align-items:center; width:max-content; background:var(--soft-red); border:1px solid #ffd5d5; color:var(--red-dark); border-radius:999px; padding:9px 14px; font-size:13px; font-weight:950; }
+    .eyebrow { color:var(--red); text-transform:uppercase; letter-spacing:.2em; font-size:12px; font-weight:950; margin:0 0 12px; }
+    h1 { font-size:clamp(42px, 6vw, 76px); line-height:.94; letter-spacing:-.06em; margin:20px 0; }
+    h2 { font-size:clamp(30px, 4vw, 46px); line-height:1; letter-spacing:-.045em; margin:0; }
+    h3 { margin:0; font-size:22px; letter-spacing:-.02em; }
+    p { margin:0; }
+    .lead { color:#596579; font-size:18px; line-height:1.75; max-width:680px; }
+    .cta-row { display:flex; flex-wrap:wrap; gap:12px; margin-top:28px; }
+    .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:30px; max-width:620px; }
+    .stat { background:#fff; border:1px solid var(--line); border-radius:22px; padding:16px; }
+    .stat small { color:#94a3b8; text-transform:uppercase; font-weight:950; font-size:11px; letter-spacing:.08em; }
+    .stat strong { display:block; font-size:32px; margin-top:4px; }
+    .browser { background:var(--dark); border:1px solid var(--line); padding:12px; border-radius:32px; box-shadow:var(--shadow); }
+    .dots { display:flex; align-items:center; gap:6px; color:#94a3b8; font-size:10px; font-weight:700; margin:0 0 12px 4px; }
+    .dot { width:10px; height:10px; border-radius:99px; display:block; }
+    .red { background:#fb7185; } .yellow { background:#fbbf24; } .green { background:#34d399; }
+    .screen { background:#fff; border-radius:26px; padding:18px; overflow:hidden; }
+    .grid { display:grid; gap:20px; }
+    .grid-2 { grid-template-columns:repeat(2,1fr); }
+    .grid-3 { grid-template-columns:repeat(3,1fr); }
+    .grid-4 { grid-template-columns:repeat(4,1fr); }
+    .grid-5 { grid-template-columns:repeat(5,1fr); }
+    .section-title { text-align:center; max-width:760px; margin:0 auto 42px; }
+    .section-title p:last-child { margin-top:14px; color:var(--muted); line-height:1.7; }
+    .card { background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:24px; box-shadow:0 1px 0 rgba(15,23,42,.02); transition:.2s ease; text-align:left; }
+    button.card { width:100%; color:inherit; }
+    .card.soft { background:var(--soft); }
+    .icon { width:48px; height:48px; border-radius:18px; display:grid; place-items:center; background:var(--soft-red); color:var(--red); font-weight:950; flex:none; }
+    .card h3 { margin-top:18px; }
+    .card p { color:var(--muted); line-height:1.65; margin-top:10px; font-size:14px; }
+    .linkish { display:inline-flex; align-items:center; gap:6px; margin-top:18px; color:var(--red); font-size:14px; font-weight:950; }
+    .topic-card { background:var(--soft); border:1px solid var(--line); border-radius:var(--radius); padding:24px; }
+    .topic-link { display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding:13px 14px; background:#fff; border-radius:18px; color:#475569; font-size:14px; font-weight:800; }
+    .article-hero h1 { font-size:clamp(38px,5vw,62px); }
+    .breadcrumb { display:flex; flex-wrap:wrap; gap:8px; align-items:center; color:#64748b; font-size:12px; font-weight:800; margin-bottom:24px; }
+    .breadcrumb button { border:0; background:none; color:inherit; font-weight:900; padding:0; }
+    .quick { margin:28px auto 0; background:var(--soft-red); border:1px solid #ffd5d5; border-radius:32px; padding:24px; max-width:1240px; }
+    .quick-grid { display:grid; grid-template-columns:auto 1fr auto; gap:20px; align-items:center; }
+    .quick strong { display:block; font-size:20px; line-height:1.55; }
+    .quick span { color:#475569; font-size:14px; font-weight:800; }
+    .step-panel { display:grid; grid-template-columns:.9fr 1.1fr; gap:34px; align-items:center; }
+    .step-card { background:var(--soft); border:1px solid var(--line); border-radius:32px; padding:32px; }
+    .step-icon { width:64px; height:64px; border-radius:24px; display:grid; place-items:center; color:#fff; background:var(--red); font-size:28px; font-weight:900; margin:18px 0; }
+    .carousel-actions { display:flex; gap:12px; margin-top:24px; }
+    .square-btn { width:48px; height:48px; border-radius:18px; background:#fff; border:1px solid var(--line); font-weight:950; }
+    .timeline { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+    .timeline .unavailable { background:#fffbeb; border-color:#fde68a; }
+    .selector-grid { display:grid; grid-template-columns:.82fr 1.18fr; gap:32px; }
+    .option-list { display:grid; gap:12px; }
+    .option { border:1px solid var(--line); border-radius:24px; padding:18px; background:#fff; text-align:left; font-weight:900; }
+    .option.active { border-color:#fecaca; background:var(--soft-red); color:var(--red-dark); }
+    .result-card { border:1px solid var(--line); border-radius:32px; padding:32px; background:#fff; }
+    .result-card.warning { background:#fffbeb; border-color:#fde68a; }
+    .discount-layout { display:grid; grid-template-columns:.95fr 1.05fr; gap:34px; align-items:start; }
+    .package-choice-wrap { display:grid; gap:24px; }
+    .package-choice-panel { background:var(--soft); border:1px solid var(--line); border-radius:32px; padding:22px; }
+    .package-choice-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-top:18px; }
+    .package-card { overflow:hidden; border:1px solid var(--line); border-radius:26px; background:#fff; text-align:left; transition:.2s ease; }
+    .package-card.active { border-color:#fecaca; background:var(--soft-red); box-shadow:0 12px 25px rgba(227,39,38,.08); }
+    .package-card img { height:96px; width:100%; object-fit:cover; }
+    .package-card div { padding:15px; }
+    .package-card small { color:var(--red); font-size:11px; text-transform:uppercase; letter-spacing:.12em; font-weight:950; }
+    .package-card strong { display:block; margin-top:5px; font-size:17px; }
+    .sticky-result { position:sticky; top:98px; border-radius:32px; padding:26px; border:1px solid #bbf7d0; background:#ecfdf5; }
+    .sticky-result.warning { background:#fffbeb; border-color:#fde68a; }
+    .compare-pair { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .compare-pair .mini { background:#fff; border-radius:24px; overflow:hidden; }
+    .compare-pair img { height:110px; width:100%; object-fit:cover; }
+    .compare-pair div div { padding:14px; }
+    .big-result { margin-top:18px; background:#fff; border-radius:26px; padding:24px; }
+    .big-result h3 { font-size:52px; letter-spacing:-.05em; margin-top:10px; }
+    .mini-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:14px; }
+    .mini-stat { background:#fff; border-radius:18px; padding:14px; }
+    .mini-stat small { color:#64748b; font-weight:800; }
+    .mini-stat strong { display:block; margin-top:4px; }
+    .package-detail { position:sticky; top:98px; background:#fff; border:1px solid var(--line); border-radius:32px; padding:26px; box-shadow:var(--shadow); }
+    .package-hero { overflow:hidden; background:#f8fafc; border-radius:26px; }
+    .package-hero img { height:176px; width:100%; object-fit:cover; }
+    .package-hero div { padding:20px; }
+    .metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:18px; }
+    .metric { border-radius:22px; padding:16px; background:#f8fafc; }
+    .metric.redish { background:var(--soft-red); color:var(--red-dark); }
+    .metric.greenish { background:#ecfdf5; color:#047857; }
+    .metric small { display:block; text-transform:uppercase; letter-spacing:.12em; font-size:10px; font-weight:950; opacity:.75; }
+    .metric strong { display:block; font-size:24px; margin-top:6px; }
+    .range { margin-top:24px; }
+    input[type=range] { width:100%; accent-color:var(--red); }
+    .status-box { margin-top:22px; border-radius:26px; padding:20px; background:#ecfdf5; }
+    .status-box.warning { background:#fffbeb; }
+    .highlight-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:12px; }
+    .highlight { display:flex; gap:8px; align-items:center; background:#f8fafc; border-radius:16px; padding:11px 12px; font-size:13px; font-weight:800; color:#475569; }
+    .graph-card { border:1px solid var(--line); border-radius:26px; padding:18px; margin-top:16px; }
+    .hotspot-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .hotspot-grid.two { grid-template-columns:repeat(2,1fr); margin-top:14px; }
+    .hotspot { border:1px solid var(--line); background:#fff; border-radius:22px; padding:16px; text-align:left; }
+    .hotspot.active { border-color:#fecaca; background:var(--soft-red); }
+    .hotspot small { color:#64748b; font-weight:800; }
+    .hotspot strong { display:block; font-size:26px; margin-top:4px; }
+    .insight-layout { display:grid; grid-template-columns:1.15fr .85fr; gap:34px; align-items:start; }
+    .insight-result { position:sticky; top:98px; background:var(--soft); border:1px solid var(--line); border-radius:32px; padding:28px; }
+    .support-card { background:#fff; color:var(--ink); border-radius:26px; padding:24px; }
+    .support-card p { margin-top:10px; color:#64748b; font-weight:800; font-size:14px; line-height:1.6; }
+    .support-card small { display:block; margin-top:14px; color:#64748b; line-height:1.5; }
+    .hidden { display:none !important; }
+    .footer { background:#fff; border-top:1px solid var(--line); padding:28px 0; color:#64748b; font-size:14px; font-weight:700; }
+    .footer .wrap { display:flex; justify-content:space-between; gap:18px; flex-wrap:wrap; }
+    @media (max-width: 1040px) {
+      .searchbar, .main-nav { display:none; }
+      .mobile-search { display:block; }
+      .hero-grid, .step-panel, .selector-grid, .discount-layout, .insight-layout { grid-template-columns:1fr; }
+      .sticky-result, .package-detail, .insight-result { position:static; }
+      .grid-4, .grid-5 { grid-template-columns:repeat(2,1fr); }
+      .timeline, .metrics, .hotspot-grid { grid-template-columns:1fr; }
+      .hotspot-grid.two { grid-template-columns:1fr; }
+    }
+    @media (max-width: 700px) {
+      .wrap { padding:0 16px; }
+      .hero-grid { padding:48px 0; }
+      .section { padding:52px 0; }
+      .grid-2, .grid-3, .grid-4, .grid-5, .stats, .package-choice-grid, .compare-pair, .mini-stats, .metrics, .highlight-grid { grid-template-columns:1fr; }
+      .quick-grid { grid-template-columns:1fr; }
+      .login-btn { display:none; }
+      h1 { font-size:42px; }
+      h2 { font-size:32px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="wrap topbar">
+      <button class="brand" data-page="home">
+        <div class="logo">PG</div>
+        <div><div class="brand-title">AgentNet Help Centre</div><div class="brand-sub">Reimagined support experience</div></div>
+      </button>
+      <div class="searchbar">⌕ Search AgentNet help, topics, billing, packages, listings...</div>
+      <nav class="main-nav">
+        <button data-page="home" class="active nav-home">Help Centre</button>
+        <button data-page="home">Browse Topics</button>
+        <button onclick="document.getElementById('support').scrollIntoView({behavior:'smooth'})">Contact Support</button>
+      </nav>
+      <button class="login-btn">Agent Login</button>
+    </div>
+    <div class="mobile-search"><div class="searchbar" style="display:flex;max-width:none">⌕ Search AgentNet Help Centre</div></div>
+  </header>
+
+  <main id="app"></main>
+
+  <footer class="footer"><div class="wrap"><span>PropertyGuru Agent Offerings · Help Centre UX Prototype</span><span>We power communities to live, work, and thrive in tomorrow’s cities.</span></div></footer>
+
+  <script>
+    const IMG = {
+      bronze: 'https://www.agentofferings.propertyguru.com.sg/wp-content/uploads/2025/08/Thin-card-banner-5.png',
+      silver: 'https://www.agentofferings.propertyguru.com.sg/wp-content/uploads/2025/07/Silver.png',
+      gold: 'https://www.agentofferings.propertyguru.com.sg/wp-content/uploads/2025/08/Gold-thumb.png',
+      platinum: 'https://www.agentofferings.propertyguru.com.sg/wp-content/uploads/2025/08/Platinum.png'
+    };
+
+    const packages = [
+      { key:'bronze-core', package:'Bronze', track:'Core', tier:'Bronze', tag:'Essentials for Staying Active', audience:'For part-time or semi-retired agents, Bronze gives you the essentials to stay visible on PropertyGuru traffic.', image:IMG.bronze, monthly:'S$163/mo', annual:'S$1,948.92', adCredits:'1,000', limit:1000, limitLabel:'1,000', price:'$1.74', concurrent:'5', listingCard:'Basic', highlights:['Basic Listing Cards','Boost','Turbo'] },
+      { key:'silver-basic', package:'Silver', track:'Basic', tier:'Silver', tag:'Accelerate Your Growth', audience:'For agents looking to grow, Silver gives you the key tools to boost visibility and close deals more consistently.', image:IMG.silver, monthly:'S$490/mo', annual:'S$5,872.92', adCredits:'3,100', limit:5000, limitLabel:'5,000', price:'$1.42', concurrent:'25', listingCard:'Enhanced', highlights:['Enhanced Listing Cards','Basic Agent Profile','Promoted Listings'] },
+      { key:'silver-plus', package:'Silver', track:'Plus', tier:'Silver', tag:'Accelerate Your Growth', audience:'Plus track includes more Ad Credits and Concurrent Listings for agents with higher listing activity.', image:IMG.silver, monthly:'S$590/mo', annual:'S$7,071.92', adCredits:'4,800', limit:5000, limitLabel:'5,000', price:'$1.31', concurrent:'40', listingCard:'Enhanced', highlights:['Enhanced Listing Cards','Basic Agent Profile','Promoted Listings'] },
+      { key:'gold-basic', package:'Gold', track:'Basic', tier:'Gold', tag:'Gain a Competitive Edge', audience:'For agents ready to scale up, Gold gives you advanced visibility and tools to stand out and stay ahead.', image:IMG.gold, monthly:'S$971/mo', annual:'S$11,649.92', adCredits:'10,500', limit:20000, limitLabel:'20,000', price:'$1.25', concurrent:'60', listingCard:'Premium', highlights:['Premium Listing Cards','Premium Agent Profile','Turbo Pro','Enhanced Insights'] },
+      { key:'gold-plus', package:'Gold', track:'Plus', tier:'Gold', tag:'Gain a Competitive Edge', audience:'Plus track includes more Ad Credits and Concurrent Listings for agents ready to scale.', image:IMG.gold, monthly:'S$1,425/mo', annual:'S$17,099.92', adCredits:'17,800', limit:20000, limitLabel:'20,000', price:'$1.20', concurrent:'90', listingCard:'Premium', highlights:['Premium Listing Cards','Premium Agent Profile','Turbo Pro','Enhanced Insights'] },
+      { key:'platinum-basic', package:'Platinum', track:'Basic', tier:'Platinum', tag:'Power Your Market Leadership', audience:'For top performers and team leaders, Platinum gives you the full suite to lead the market and reinforce your stature.', image:IMG.platinum, monthly:'S$2,288/mo', annual:'S$27,454.92', adCredits:'38,000', limit:Infinity, limitLabel:'Unlimited', price:'$1.04', concurrent:'100', listingCard:'Exclusive', highlights:['Exclusive Listing Cards','Always on Boost','Unlimited Credit Top-Up','Best Top-Up Rate'] },
+      { key:'platinum-plus', package:'Platinum', track:'Plus', tier:'Platinum', tag:'Power Your Market Leadership', audience:'Plus track includes more Ad Credits and Concurrent Listings for top performers and team leaders.', image:IMG.platinum, monthly:'S$2,861/mo', annual:'S$34,321.92', adCredits:'52,000', limit:Infinity, limitLabel:'Unlimited', price:'$0.98', concurrent:'150', listingCard:'Exclusive', highlights:['Exclusive Listing Cards','Always on Boost','Unlimited Credit Top-Up','Best Top-Up Rate'] },
+    ];
+
+    const tiers = [
+      {key:'bronze', label:'Standard / Bronze', short:'Bronze', rank:0, image:IMG.bronze, tag:'Essentials for Staying Active'},
+      {key:'silver', label:'Advance / Silver', short:'Silver', rank:1, image:IMG.silver, tag:'Accelerate Your Growth'},
+      {key:'gold', label:'Premier / Gold', short:'Gold', rank:2, image:IMG.gold, tag:'Gain a Competitive Edge'},
+      {key:'platinum', label:'Business / Platinum', short:'Platinum', rank:3, image:IMG.platinum, tag:'Power Your Market Leadership'}
+    ];
+    const discountMatrix = {
+      bronze: { bronze:'2%', silver:'4%', gold:'5%', platinum:'6%' },
+      silver: { bronze:null, silver:'4%', gold:'5%', platinum:'6%' },
+      gold: { bronze:null, silver:null, gold:'5%', platinum:'6%' },
+      platinum: { bronze:null, silver:null, gold:null, platinum:'6%' }
+    };
+
+    const app = document.getElementById('app');
+    let state = { page:'home', creditStep:0, renewalChoice:'same', currentTier:'bronze', renewalTier:'gold', packageIndex:4, usedCredits:7000, insight:'impressions', range:'7 days' };
+
+    const pageMeta = {
+      credits: { eyebrow:'Manage Your Billing and Account Smoothly', title:'How To Purchase Credits Online?', category:'Agent Packages / Billing & Account', update:'Last update: August 29, 2025', type:'Transactional task page', intro:'Use the Agent Self-Serve Channel to purchase Ad Credits anytime, anywhere, with secure checkout and access after payment so you can take immediate action on listings.', quick:'Active PropertyGuru Agent Partners can buy Ad Credits through AgentNet desktop or mobile web. Credits are usually issued immediately after successful payment, with rare technical delays of up to 30 minutes.', intent:'Buy credits, use promo code, check balance, view invoice' },
+      renewal: { eyebrow:'Manage Your Package', title:'Renewing Your Agent Package (AM and EB Renewal)', category:'Agent Packages / Manage Your Package', update:'Last update: September 8, 2025', type:'Decision + process page', intro:'A clearer renewal experience that helps agents secure their preferred package at the right time, understand available upgrade paths, and avoid access disruption.', quick:'Renewal is available during the Early Bird window, which is the month before expiry month, and during the Actual Month window, which is the expiry month itself. You cannot renew outside these two windows.', intent:'Check renewal window, renew online, upgrade, downgrade' },
+      topup: { eyebrow:'Understand Your Package Entitlements', title:'Ad Credits Top Up Limit', category:'Agent Packages / Package Entitlements', update:'Last update: September 6, 2025', type:'Policy + entitlement checker', intro:'A self-serve way to understand Ad Credit top-up limits, package pricing, and what to do when your usage needs grow beyond your current plan.', quick:'Credit top-up limits are tiered from 1,000 credits on Bronze to Unlimited on Platinum. If you hit your limit, wait for a new subscription term or upgrade your core package to the next tier.', intent:'Check package limit, compare prices, plan credit usage' },
+      insights: { eyebrow:'Data and Insights Tools', title:'Listing Performance Insights', category:'Elevate Your Strategy with Data & Insights', update:'Last update: August 29, 2025', type:'Product education + strategy coach', intro:'Listing Performance Insights is a dashboard in AgentNet that shows how listings are doing and what to do next across visibility, listing quality, and pricing.', quick:'Agents can view impressions, views, leads, smart insights, and price recommendations, with date shortcuts up to 180 days and close-to-hourly updates for key metrics.', intent:'Read metrics, check price insight, improve listing performance' }
+    };
+
+    function setState(patch){ state = {...state, ...patch}; render(); window.scrollTo({top:0, behavior:'smooth'}); }
+    function softSet(patch){ state = {...state, ...patch}; render(false); }
+    function icon(label){ return `<div class="icon">${label}</div>`; }
+    function sectionTitle(eyebrow,title,copy){ return `<div class="section-title"><p class="eyebrow">${eyebrow}</p><h2>${title}</h2>${copy?`<p>${copy}</p>`:''}</div>`; }
+    function browser(inner,label='agentnet.propertyguru'){ return `<div class="browser"><div class="dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span style="margin-left:auto">${label}</span></div><div class="screen">${inner}</div></div>`; }
+    function metric(title,value,tone=''){ return `<div class="metric ${tone}"><small>${title}</small><strong>${value}</strong></div>`; }
+
+    function home(){
+      const featured = [
+        ['credits','Buy Ad Credits online','Billing & Account','2 min task','Purchase Ad Credits anytime through the Agent Self-Serve Channel, apply promo codes, and check your billing record.','💳'],
+        ['renewal','Renew your agent package','Manage Your Package','Decision guide','Check Early Bird and Actual Month windows, compare renewal paths, and understand what changes after upgrade or downgrade.','🗓'],
+        ['topup','Check your top-up limit','Package Entitlements','Interactive checker','Select your package to see the credit top-up limit, price per credit, and options when you hit your cap.','📊'],
+        ['insights','Read listing performance','Data & Insights','Dashboard coach','Understand impressions, views, leads, price insights, and recommendations that improve listing performance.','📈']
+      ];
+      const topics = [
+        ['Welcome to AgentNet','👤','Help agents set up their AgentNet profile, understand key features, and begin their journey with confidence.',['How to Post a New Listing on AgentNet','Login to Your AgentNet Account','How to Install the AgentNet App']],
+        ['Agent Packages','📦','All the information you need about your package, including upgrades, renewals, billing, and entitlements.',['How To Purchase Credits Online?','Renewing Your Agent Package','Ad Credits Top Up Limit']],
+        ['Elevate Your Strategy with Data & Insights','📈','Help agents use insights tools to work smarter, prioritise leads, pitch confidently, and close faster.',['Listing Performance Insights','Unit & Project Insights','Prospector']],
+        ['Maximise Your Listing Visibility','🚀','Understand when and how to use visibility tools effectively to drive more views, leads, and conversions.',['Promoted Listing','Ranking Tools','Listing Performance']],
+        ['Strengthen Your Professional Branding','✅','Equip agents with tools and strategies to build credibility, trust, and a standout personal brand.',['Agent Profiles','Verified Listings','Listing Cards']],
+        ['Campaigns and Promotions','✨','Receive the latest updates on campaigns and promotions that can maximise savings.',['Latest Campaigns','Promotion Mechanics','Savings Opportunities']]
+      ];
+      return `<section class="hero"><div class="wrap hero-grid"><div><div class="pill">📚 Agent support, rebuilt around tasks</div><h1>Welcome to Agent Help Centre</h1><p class="lead">Explore the library of help articles through a faster, action-led experience built for agents who want to complete tasks, understand tools, and move on.</p><div class="searchbar" style="display:flex;max-width:680px;margin-top:30px;background:#fff;box-shadow:var(--shadow)">⌕ Search by goal: renew package, buy credits, top-up limit, listing performance</div><div class="stats"><div class="stat"><small>Popular docs</small><strong>3</strong></div><div class="stat"><small>Key topics</small><strong>6</strong></div><div class="stat"><small>Remade flows</small><strong>4</strong></div></div></div>${browser(`<div style="display:flex;justify-content:space-between;gap:16px;align-items:center"><div><p class="eyebrow">Agent tasks</p><h3>What do you need help with?</h3></div>${icon('⌕')}</div><div class="grid" style="margin-top:18px">${featured.map(f=>`<button class="card" onclick="setState({page:'${f[0]}'})"><div style="display:flex;gap:16px;align-items:flex-start"><div class="icon">${f[5]}</div><div style="flex:1"><strong>${f[1]}</strong><p>${f[4]}</p><span class="linkish">${f[3]} →</span></div></div></button>`).join('')}</div>`,'Help Centre / overview')}</div></section>
+      <section class="section"><div class="wrap">${sectionTitle('Popular docs','Keep the most-used articles within reach','The landing page can still show article discovery, but now it gives users context on why each article matters.')}<div class="grid grid-3">${[['home','Login to Your AgentNet Account','Welcome to AgentNet','Access and account setup support'],['topup','Ad Credits Top Up Limit','Agent Packages','Limits, prices and package planning'],['home','What is Turbo Pro?','Maximise Your Listing Visibility','Ranking tool education']].map(d=>`<button class="card" onclick="setState({page:'${d[0]}'})">${icon('📄')}<p class="eyebrow" style="margin-top:18px">${d[2]}</p><h3>${d[1]}</h3><p>${d[3]}</p><span class="linkish">Open guide →</span></button>`).join('')}</div></div></section>
+      <section class="section white"><div class="wrap">${sectionTitle('All topics','Get support for anything AgentNet','Topic cards are grouped by agent outcome, with quick links to common actions inside each area.')}<div class="grid grid-3">${topics.map(t=>`<div class="topic-card">${icon(t[1])}<h3 style="margin-top:18px">${t[0]}</h3><p style="color:var(--muted);line-height:1.65;margin-top:10px">${t[2]}</p><div style="margin-top:18px">${t[3].map(l=>`<div class="topic-link"><span>${l}</span><span>›</span></div>`).join('')}</div></div>`).join('')}</div></div></section>`;
+    }
+
+    function articleFrame(page, visual, content){
+      const m = pageMeta[page];
+      return `<section class="hero article-hero"><div class="wrap hero-grid"><div><div class="breadcrumb"><button onclick="setState({page:'home'})">Help Centre</button><span>›</span><span>${m.category}</span></div><div class="pill">✨ ${m.type}</div><p class="eyebrow" style="margin-top:28px">${m.eyebrow}</p><h1>${m.title}</h1><p style="color:#64748b;font-weight:800;margin-bottom:18px">${m.update}</p><p class="lead">${m.intro}</p><div class="cta-row"><button class="primary" onclick="document.querySelector('.after-quick')?.scrollIntoView({behavior:'smooth'})">Start action →</button><button class="secondary" onclick="setState({page:'home'})">Back to Help Centre</button></div></div>${visual}</div></section><div class="wrap"><div class="quick"><div class="quick-grid">${icon('？')}<div><p class="eyebrow">Quick answer</p><strong>${m.quick}</strong><span>Primary intent: ${m.intent}</span></div><div class="pill" style="background:#fff">Action-first guide</div></div></div></div><div class="after-quick"></div>${content}${related(page)}${support()}`;
+    }
+
+    function creditsVisual(){ return browser(`<div style="display:flex;justify-content:space-between"><div><p class="eyebrow">Billing</p><h3>Purchase Ad Credits</h3></div>${icon('💳')}</div><div class="grid grid-3" style="margin-top:22px">${['300','600','1,000'].map((a,i)=>`<div class="card" style="padding:16px;${i==1?'background:var(--soft-red);border-color:#fecaca':''}"><strong style="font-size:30px">${a}</strong><p>Ad Credits</p><div style="height:36px;border-radius:14px;background:${i==1?'var(--red)':'#f1f5f9'};margin-top:14px"></div></div>`).join('')}</div><div class="card" style="margin-top:18px;background:var(--soft-red);border-style:dashed"><strong>✨ Apply promo code at checkout</strong></div>`,'AgentNet / Self-Serve Channel'); }
+    function creditsPage(){
+      const steps = [
+        ['Log in to AgentNet','Open AgentNet from desktop or mobile web. This service is not currently available in the mobile app.','🖥'],
+        ['Visit the Self-Serve Channel','Go to the online purchase flow where active PropertyGuru Agent Partners can buy Ad Credits.','💳'],
+        ['Choose Ad Credits','Select the credit quantity that matches your listing activity and exposure needs.','💰'],
+        ['Apply promo code','Enter a valid promo code at checkout to enjoy either a fixed amount or percentage discount.','✨'],
+        ['Complete secure payment','Payment is processed via accredited partner Adyen. PropertyGuru does not store card details.','🔒'],
+        ['Check Billing','Go to Edit Account > Billing to check balance, purchase history, and invoices when ready.','🧾']
+      ];
+      const s = steps[state.creditStep];
+      const content = `<section class="section"><div class="wrap">${sectionTitle('Self-Serve Channel','Buy credits without waiting for office hours','The original article explains the benefits first. Here, those benefits become task cards the agent can scan in seconds.')}<div class="grid grid-5">${[['Purchase anytime','Buy Ad Credits anytime, anywhere.','⏱'],['One checkout','Move from selection to payment in one platform.','💳'],['Instant access','Receive credits after successful purchase.','✅'],['Online deals','Access promotions exclusive to the Self-Serve Channel.','✨'],['Secure payment','Transact via accredited payment gateway partners.','🔒']].map(c=>`<div class="card">${icon(c[2])}<h3>${c[0]}</h3><p>${c[1]}</p></div>`).join('')}</div><div class="card" style="margin-top:20px;background:#fffbeb;border-color:#fde68a"><strong>Availability note:</strong> This service is available on AgentNet desktop and mobile web, not currently in the mobile app.</div></div></section>
+      <section class="section white"><div class="wrap">${sectionTitle('Step-by-step carousel','How to purchase Ad Credits online','The article becomes a visual walkthrough with each step mapped to the actual flow.')}<div class="step-panel"><div class="step-card"><p class="eyebrow">Step ${state.creditStep+1} of ${steps.length}</p><div class="step-icon">${s[2]}</div><h2>${s[0]}</h2><p class="lead" style="margin-top:16px">${s[1]}</p><div class="carousel-actions"><button class="square-btn" onclick="softSet({creditStep:${(state.creditStep-1+steps.length)%steps.length}})">‹</button><button class="primary" onclick="softSet({creditStep:${(state.creditStep+1)%steps.length}})">Next step ›</button></div></div>${browser(`<p class="eyebrow">${s[0]}</p><h3>What the agent sees</h3><div style="background:var(--dark);border-radius:24px;padding:20px;color:#fff;margin-top:18px"><div style="display:flex;justify-content:space-between"><strong>AgentNet</strong><span class="pill" style="background:rgba(255,255,255,.08);border:0;color:#fff">Secure</span></div><div class="grid" style="margin-top:20px"><div style="height:48px;background:rgba(255,255,255,.1);border-radius:16px"></div><div style="height:48px;background:rgba(255,255,255,.1);border-radius:16px"></div><div style="height:48px;background:var(--red);border-radius:16px"></div></div></div>`,'Step visual')}</div></div></section>
+      <section class="section"><div class="wrap">${sectionTitle('After purchase','Show reassurance immediately after payment','These are the high-anxiety details from the article, turned into a status tracker.')}<div class="grid grid-4">${[['Credit issuance','Usually immediate','Rare technical delays may take up to 30 minutes.','✅'],['Check balance','Edit Account > Billing','Use AgentNet to confirm your updated Ad Credit balance.','⌕'],['Purchase history','Billing section','Invoices are available within 24 hours.','🧾'],['Card statement','PropertyGuru Pte Ltd','This is how the transaction appears on your card statement.','💳']].map(c=>`<div class="card">${icon(c[3])}<h3>${c[0]}</h3><strong style="display:block;color:var(--red);font-size:24px;margin-top:8px">${c[1]}</strong><p>${c[2]}</p></div>`).join('')}</div></div></section>
+      <section class="section white"><div class="wrap grid grid-2"><div class="card" style="background:#fffbeb;border-color:#fde68a">${icon('✨')}<p class="eyebrow" style="margin-top:18px;color:#b45309">Promo code logic</p><h2>Promotions & Deals</h2>${['Some promotions are exclusive to the Self-Serve Channel and may be online-only.','Stay updated through AgentNet, email, SMS, or your Account Manager.','Apply a valid promo code at checkout for a fixed amount or percentage discount.','Missed promo codes cannot be amended or refunded after purchase completion.'].map(x=>`<p>✅ ${x}</p>`).join('')}</div><div class="card" style="background:var(--dark);color:#fff">${icon('🔒')}<p class="eyebrow" style="margin-top:18px;color:#fca5a5">Payment confidence</p><h2>Security & Support</h2>${['PropertyGuru does not store your card details.','Payments are processed via Adyen with Level 1 PCI compliance and secure encryption.','For suspicious charges, contact Customer Service with transaction details.','Support: +65 6238 5971, custcare@propertyguru.com.sg, WhatsApp +65 9298 1629.'].map(x=>`<p style="color:#cbd5e1">✅ ${x}</p>`).join('')}</div></div></section>`;
+      return articleFrame('credits', creditsVisual(), content);
+    }
+
+    function renewalVisual(){ return browser(`<div style="display:flex;justify-content:space-between"><div><p class="eyebrow">Package renewal</p><h3>Gold Plus renewal available</h3></div>${icon('🗓')}</div><div style="background:var(--dark);color:#fff;border-radius:26px;padding:20px;margin-top:22px"><div style="display:flex;justify-content:space-between"><div><small style="color:#94a3b8;font-weight:800">Expiry date</small><strong style="display:block;font-size:32px;margin-top:4px">7 Aug 2025</strong></div><span class="pill" style="background:#34d399;border:0;color:#06251b">EB active</span></div><div style="height:12px;background:rgba(255,255,255,.1);border-radius:99px;margin-top:24px"><div style="height:12px;width:60%;background:var(--red);border-radius:99px"></div></div><div style="display:flex;justify-content:space-between;color:#cbd5e1;font-size:12px;font-weight:800;margin-top:14px"><span>1 Jul</span><span>7 Aug</span><span>31 Aug</span></div></div><button class="primary" style="width:100%;margin-top:18px">Renew Online</button>`,'AgentNet / Renewal'); }
+    function renewalPage(){
+      const choices = {
+        same:['Renew on the same track','Gold → Gold','Keep the same package level when your current entitlements fit your business needs.',['Continue package','New 12-month term','Review pricing before checkout']],
+        within:['Upgrade within the same tier','Gold → Gold Plus','Move to Plus for more Ad Credits and/or higher top-up limits while branding, tools and insights remain at the same tier.',['More Ad Credits','Higher top-up capacity','Starts from new package date']],
+        higher:['Upgrade to a higher tier','Silver Plus → Gold / Gold Plus','Move up when you need higher-tier branding, tools, insights, and ranking tools such as Turbo Pro.',['Adjusted Ad Credits','Higher-tier tools','12-month subscription']],
+        downgrade:['Downgrade during renewal','Silver → Bronze','Downgrades reduce credit top-up limit, restrict carry-over and remove package upgrade discount eligibility for the next 3 months.',['No upgrade discounts for 3 months','Excess credits expire immediately','Carried-over purchases count toward new limits']]
+      };
+      const a = choices[state.renewalChoice];
+      const content = `<section class="section"><div class="wrap">${sectionTitle('Eligibility timeline','Make EB and AM windows visual','The article’s date rules become a clear renewal timeline using the original example package expiry: 7 Aug 2025.')}<div class="timeline">${[['Early Bird (EB)','1 Jul 2025 – 31 Jul 2025','1st day of the month before your expiry month to the last day of that month.','Discount window'],['Actual Month (AM)','1 Aug 2025 – 31 Aug 2025','1st day of your expiry month to the last day of that month.','Renewal window'],['Outside EB/AM','Before 1 Jul or after 31 Aug','You cannot renew outside the Early Bird and Actual Month windows.','Unavailable']].map(t=>`<div class="card ${t[3]=='Unavailable'?'unavailable':''}"><p class="eyebrow">${t[3]}</p><h3>${t[0]}</h3><strong style="display:block;margin-top:10px">${t[1]}</strong><p>${t[2]}</p></div>`).join('')}</div></div></section>
+      <section class="section white"><div class="wrap">${sectionTitle('Renewal path selector','Show consequences before checkout','The live content has multiple renewal scenarios. This selector helps agents understand the path before they commit.')}<div class="selector-grid"><div class="option-list">${Object.entries(choices).map(([k,v])=>`<button class="option ${state.renewalChoice==k?'active':''}" onclick="softSet({renewalChoice:'${k}'})">${v[0]}<br><span style="color:var(--red);font-size:14px">${v[1]}</span></button>`).join('')}</div><div class="result-card ${state.renewalChoice=='downgrade'?'warning':''}"><p class="eyebrow">Selected renewal path</p><h2>${a[0]}</h2><strong style="display:block;color:var(--red);font-size:20px;margin-top:12px">${a[1]}</strong><p class="lead" style="margin-top:18px">${a[2]}</p><div class="grid grid-3" style="margin-top:24px">${a[3].map(p=>`<div class="card" style="padding:16px"><strong>✅ ${p}</strong></div>`).join('')}</div>${state.renewalChoice=='downgrade'?`<div class="card" style="margin-top:18px;background:#fff">Example from the article: If you purchased 5,000 credits on Silver and downgrade to Bronze with 2,000 credits left, you carry over 1,000 credits, forfeit 1,000 credits, and cannot top up more until the next renewal cycle.</div>`:''}</div></div></div></section>
+      <section class="section"><div class="wrap">${sectionTitle('Step-by-step renewal','Turn the renewal process into a guided flow','These steps follow the article’s renewal sequence from AgentNet login to activation alerts.')}<div class="grid grid-3">${['Log in to AgentNet|Click Renew Online from the dashboard widget or go to Profile > Package > Renew.','Select your renewal package|AgentNet recommends a package based on past usage. You can accept it or choose another package that suits your goals.','Choose your start date|Default start date is 1 day after your current package expires. You can click the pencil icon to change the start date.','Review renewal details|Double-check your package selection, start date, and pricing before checkout.','Checkout securely|Pay by one-time credit card payment or 6/12-month interest-free instalments for UOB, OCBC, DBS credit cards with minimum $500.','Receive alerts|You’ll receive payment confirmation by email, order confirmation by SMS, and activation SMS on your chosen start date.'].map((s,i)=>{let [h,p]=s.split('|'); return `<div class="card"><div class="icon" style="background:var(--red);color:#fff">${i+1}</div><h3>${h}</h3><p>${p}</p></div>`}).join('')}</div></div></section>${discountExplorer()}`;
+      return articleFrame('renewal', renewalVisual(), content);
+    }
+
+    function discountExplorer(){
+      const current = tiers.find(t=>t.key===state.currentTier), renewal = tiers.find(t=>t.key===state.renewalTier);
+      const discount = discountMatrix[state.currentTier][state.renewalTier];
+      const available = Boolean(discount);
+      return `<section class="section white"><div class="wrap">${sectionTitle('Early renewal savings','Make the discount table a package selector','Instead of asking agents to read across rows and columns, let them choose their current package and renewal package to see whether the Early Bird discount applies.')}<div class="discount-layout"><div class="package-choice-wrap"><div class="package-choice-panel"><strong>1. Current package</strong><div class="package-choice-grid">${tiers.map(t=>packageTierCard(t,state.currentTier,'currentTier')).join('')}</div></div><div class="package-choice-panel"><strong>2. Renewal package</strong><div class="package-choice-grid">${tiers.map(t=>packageTierCard(t,state.renewalTier,'renewalTier')).join('')}</div></div></div><div class="sticky-result ${available?'':'warning'}"><div class="compare-pair"><div class="mini"><img src="${current.image}" alt="${current.short}"><div><small>Current</small><strong>${current.label}</strong></div></div><div class="mini"><img src="${renewal.image}" alt="${renewal.short}"><div><small>Renewal</small><strong>${renewal.label}</strong></div></div></div><div class="big-result"><p class="eyebrow">Early Bird result</p><h3>${available?discount:'Not Applicable'}</h3><p style="line-height:1.7;color:#475569">${available?'This path is eligible for this Early Bird rate before GST when renewed during the month before expiry.':'This path is treated as a downgrade or invalid renewal path for Early Bird discount purposes, so the discount does not apply.'}</p></div><div class="mini-stats"><div class="mini-stat"><small>Window</small><strong>Month before expiry</strong></div><div class="mini-stat"><small>Applies to</small><strong>Selected package</strong></div><div class="mini-stat"><small>GST</small><strong>Before GST</strong></div></div><div class="mini-stat" style="margin-top:12px;line-height:1.6">Early Bird renewal is available only during the month before the package expiry month. Package renewal outside the EB and AM windows is not available through this flow.</div></div></div></div></section>`;
+    }
+    function packageTierCard(t,active,field){ return `<button class="package-card ${active===t.key?'active':''}" onclick="softSet({${field}:'${t.key}'})"><img src="${t.image}" alt="${t.short}"><div><small>${t.label}</small><strong>${t.tag}</strong></div></button>`; }
+
+    function topupVisual(){ return browser(`<div style="display:flex;justify-content:space-between"><div><p class="eyebrow">Top-up limit</p><h3>Gold Plus</h3></div>${icon('📊')}</div><div class="grid grid-3" style="margin-top:22px"><div class="metric redish"><small>Limit</small><strong>20,000</strong></div><div class="metric"><small>Price</small><strong>$1.20</strong></div><div class="metric greenish"><small>Status</small><strong>Can top up</strong></div></div><div style="height:12px;background:#f1f5f9;border-radius:99px;margin-top:20px"><div style="height:12px;width:40%;background:var(--red);border-radius:99px"></div></div>`,'AgentNet / Entitlement checker'); }
+    function topupPage(){
+      const pkg = packages[state.packageIndex];
+      const unlimited = pkg.limit === Infinity;
+      const remaining = unlimited ? Infinity : Math.max(pkg.limit-state.usedCredits,0);
+      const percentage = unlimited ? 100 : Math.min((state.usedCredits/pkg.limit)*100,100);
+      const content = `<section class="section"><div class="wrap">${sectionTitle('Why the change exists','Put the policy into plain operational terms','The article’s rationale becomes a quick explanation before the package checker.')}<div class="grid grid-3">${[['Choose the right-fit package upfront','Top-up limits are designed to guide agents toward the right balance of listings, tools and credits.','📦'],['Avoid over-reliance on purchases','The limit prevents credit purchases from becoming an unsustainable listing practice.','💳'],['Still scale when needed','Agents can select a Plus track or upgrade to a higher package with larger or unlimited limits.','🚀']].map(i=>`<div class="card">${icon(i[2])}<h3>${i[0]}</h3><p>${i[1]}</p></div>`).join('')}</div></div></section>
+      <section class="section white"><div class="wrap">${sectionTitle('Interactive checker','Select a package. See the exact limit.','The original comparison table becomes a visual package selector using the live package information and imagery.')}<div class="discount-layout"><div class="package-choice-panel"><div style="display:flex;justify-content:space-between;gap:16px"><div><strong>Choose package and track</strong><p style="color:var(--muted);margin-top:6px">Plus track includes more Ad Credits and Concurrent Listings.</p></div><span class="pill" style="background:#fff">Includes 9% GST</span></div><div class="package-choice-grid" style="margin-top:22px">${packages.map((p,i)=>`<button class="package-card ${state.packageIndex===i?'active':''}" onclick="softSet({packageIndex:${i}})"><div style="position:relative;padding:0"><img src="${p.image}" alt="${p.package}"><span class="pill" style="position:absolute;right:10px;top:10px;background:#fff;color:var(--ink);border:0">${p.track}</span></div><div><small>${p.package}</small><strong>${p.tag}</strong><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;font-size:12px;color:#475569"><span>${p.monthly}</span><span>${p.concurrent} listings</span><span>${p.adCredits} credits</span><span>Top-up ${p.limitLabel}</span></div></div></button>`).join('')}</div></div><div class="package-detail"><div class="package-hero"><img src="${pkg.image}" alt="${pkg.package}"><div><p class="eyebrow">Selected package</p><h2>${pkg.package} ${pkg.track==='Core'?'':pkg.track}</h2><p style="color:var(--muted);line-height:1.7;margin-top:12px">${pkg.audience}</p></div></div><div class="metrics">${metric('Monthly price',pkg.monthly,'redish')}${metric('Billed annually',pkg.annual)}${metric('Concurrent listings',pkg.concurrent,'greenish')}</div><div class="metrics">${metric('Ad Credits included',pkg.adCredits,'redish')}${metric('Top-up limit',pkg.limitLabel)}${metric('Top-up price',pkg.price,'greenish')}</div>${unlimited?'':`<div class="range"><label style="display:flex;justify-content:space-between;font-weight:900"><span>Credits already topped up this term</span><span>${state.usedCredits.toLocaleString()}</span></label><input type="range" min="0" max="${pkg.limit+1000}" value="${state.usedCredits}" oninput="softSet({usedCredits:Number(this.value)})"><div style="height:12px;background:#f1f5f9;border-radius:99px;margin-top:12px"><div style="height:12px;width:${percentage}%;background:${remaining>0?'var(--red)':'#f59e0b'};border-radius:99px"></div></div></div>`}<div class="status-box ${(!unlimited&&remaining<=0)?'warning':''}"><h3>${unlimited?'No fixed cap':remaining>0?'You can still purchase more credits':'You have hit your top-up limit'}</h3><p style="color:#475569;line-height:1.7;margin-top:8px">${unlimited?'Platinum packages allow unlimited top-ups and offer the best listed top-up rates.':remaining>0?`You have ${remaining.toLocaleString()} credits left before reaching the ${pkg.limitLabel} top-up limit for this subscription term.`:'You won’t be able to purchase more until your new subscription term or until you upgrade your core package to the next tier. You cannot switch from Basic to Plus mid-subscription just to unlock more top-ups.'}</p></div><div class="card" style="margin-top:18px;padding:18px"><strong>Package highlights</strong><div class="highlight-grid">${pkg.highlights.map(h=>`<div class="highlight">✅ ${h}</div>`).join('')}</div><p style="font-weight:800">Listing Card: ${pkg.listingCard}</p></div></div></div></div></section>
+      <section class="section"><div class="wrap">${sectionTitle('Legacy packages','Keep legacy users covered','The live article also applies limits to Standard, Advance, Premier and Business packages.')}<div class="grid grid-4">${[['Standard','1,000','$1.74'],['Advance','5,000','$1.42'],['Premier','20,000','$1.25'],['Business','Unlimited','$1.04']].map(l=>`<div class="card"><h3>${l[0]}</h3><p>Credit Top-Up Limit</p><strong style="color:var(--red);font-size:30px">${l[1]}</strong><p>Price per Credit</p><strong style="font-size:24px">${l[2]}</strong></div>`).join('')}</div><div class="grid grid-2" style="margin-top:22px"><div class="card" style="background:#fffbeb;border-color:#fde68a"><h3>If you downgrade</h3>${['The credit top-up limit adjusts to the downgraded package.','Purchases carried over count toward the new top-up limits until the next renewal cycle.','Previously purchased Ad Credits are only retained up to the new lower package limit.','Extra credits above the new limit automatically expire once the downgrade takes effect.'].map(x=>`<p>✅ ${x}</p>`).join('')}</div><div class="card"><h3>Avoid exceeding the limit</h3>${['Choose the Plus track upfront if you foresee higher usage.','Consider a higher-tier package with higher limits or unlimited top-ups.','Use subscription credits first, especially on Plus tracks for regular listing activity.','Treat the limit as credit planning support, not a cap on business growth.'].map(x=>`<p>✅ ${x}</p>`).join('')}</div></div></div></section>`;
+      return articleFrame('topup', topupVisual(), content);
+    }
+
+    const insights = {
+      impressions:['Impressions','18,420','Shows how often the listing is seen. The graph visualises impressions, views and leads with day-on-day trends.','📊'],
+      views:['Views','2,936','Shows how many users opened the listing. Use it with impressions to understand whether the listing tile is attracting clicks.','⌕'],
+      leads:['Leads','86','Shows enquiry performance. Impressions, views, leads and Ad Product Usage are updated on a close-to-hourly basis.','🎯'],
+      price:['Price Insight','+6%','Compares the listing price against similar nearby listings within 500m. If none are available, it falls back to a 1km radius.','💵'],
+      recommendations:['Recommendations','3 actions','Price recommendations suggest a competitive range so agents can see when price may be reducing impressions or views.','✨']
+    };
+    function graph(){ return `<div class="graph-card"><div style="display:flex;justify-content:space-between"><strong>Engagement trend</strong><span style="color:var(--green);font-weight:800;font-size:12px">Close-to-hourly updates</span></div><svg viewBox="0 0 640 220" style="width:100%;height:230px;margin-top:10px"><defs><linearGradient id="fillRed" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#e32726" stop-opacity=".18"/><stop offset="100%" stop-color="#e32726" stop-opacity="0"/></linearGradient></defs>${[40,80,120,160,200].map(y=>`<line x1="0" x2="640" y1="${y}" y2="${y}" stroke="#e2e8f0"/>`).join('')}<path d="M0 176 C70 142 96 160 142 122 C190 82 232 106 275 88 C326 66 356 126 402 102 C455 74 500 82 548 52 C585 30 610 46 640 38" fill="none" stroke="#e32726" stroke-width="5" stroke-linecap="round"/><path d="M0 176 C70 142 96 160 142 122 C190 82 232 106 275 88 C326 66 356 126 402 102 C455 74 500 82 548 52 C585 30 610 46 640 38 L640 220 L0 220 Z" fill="url(#fillRed)"/></svg></div>`; }
+    function insightsVisual(){ return browser(`<div style="display:flex;justify-content:space-between"><div><p class="eyebrow">Performance</p><h3>Listing dashboard</h3></div>${icon('📈')}</div><div class="grid grid-3" style="margin-top:20px">${['18.4K Impressions','2.9K Views','86 Leads'].map(x=>{let [a,...b]=x.split(' '); return `<div class="card" style="padding:16px"><strong style="font-size:24px">${a}</strong><p>${b.join(' ')}</p></div>`}).join('')}</div>${graph()}`,'AgentNet / Listing Performance'); }
+    function insightsPage(){
+      const selected = insights[state.insight];
+      const content = `<section class="section"><div class="wrap">${sectionTitle('Core features','Explain the dashboard by interaction','The article lists three core features. Here, each becomes a clickable product learning module.')}<div class="grid grid-3">${[['Performance Metrics Graph','Visualises impressions, views and leads with day-on-day trends, plus a date picker that supports up to 180 days.','📈'],['Smart Insights','Helps agents connect visibility, listing quality and pricing so they know what to do next.','✨'],['Price Recommendation','Recommends a competitive price range to help agents see whether pricing may be reducing impressions and views.','💵']].map(i=>`<div class="card">${icon(i[2])}<h3>${i[0]}</h3><p>${i[1]}</p></div>`).join('')}</div></div></section>
+      <section class="section white"><div class="wrap">${sectionTitle('Dashboard hotspot explainer','Click the metric. Understand the action.','The dashboard becomes the article. Agents learn by exploring the same mental model they’ll use inside AgentNet.')}<div class="insight-layout"><div>${browser(`<div style="display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap"><div><p class="eyebrow">3-bedroom condo</p><h3>Listing Performance Insights</h3></div><div>${['7 days','30 days','60 days','180 days'].map(r=>`<button class="secondary" style="padding:8px 12px;border-radius:999px;margin:3px;${state.range===r?'background:var(--red);color:#fff;border-color:var(--red)':''}" onclick="softSet({range:'${r}'})">${r}</button>`).join('')}</div></div><div class="hotspot-grid" style="margin-top:18px">${Object.entries(insights).slice(0,3).map(([k,v])=>hotspot(k,v)).join('')}</div>${graph()}<div class="hotspot-grid two">${Object.entries(insights).slice(3).map(([k,v])=>hotspot(k,v)).join('')}</div>`,'AgentNet / Performance tab')}</div><div class="insight-result">${icon(selected[3])}<p class="eyebrow" style="margin-top:24px">Selected insight</p><h2>${selected[0]}</h2><strong style="display:block;font-size:24px;color:#64748b;margin-top:16px">${selected[1]}</strong><p class="lead" style="margin-top:20px">${selected[2]}</p><div class="card" style="margin-top:20px"><strong>Date picker:</strong><p>Default last 7 days, with shortcuts for 30, 60 and 180 days plus a custom date range up to the past 180 days.</p></div></div></div></div></section>
+      <section class="section"><div class="wrap">${sectionTitle('How to access','Keep the article steps short and visual','The access instructions remain, but they are presented as a compact process strip.')}<div class="grid grid-4">${['On AgentNet, visit Listings and click Performance on any listing.','View engagement trends, including impressions, views and leads over 180 days.','Check your pricing against similar nearby listings.','Review recommendations to improve visibility and drive more enquiries.'].map((s,i)=>`<div class="card"><div class="icon" style="background:var(--red);color:#fff">${i+1}</div><p style="font-weight:800;color:#475569">${s}</p></div>`).join('')}</div></div></section>
+      <section class="section dark"><div class="wrap">${sectionTitle('FAQ as confidence cards','Answer practical seller-facing questions','The FAQ becomes a set of cards agents can use before opening the dashboard.')}<div class="grid grid-4">${[['Where is it?','AgentNet > Listings. Click the Performance tab on any active or expired listing.'],['Only boosted listings?','No. You’ll see insights for all your listings, regardless of product used.'],['What does it show?','Impressions, views and leads over the past 180 days, plus pricing insights and personalised recommendations.'],['Can I show sellers?','Yes. The data can support performance discussions, pricing conversations, and HDB appeal situations.']].map(f=>`<div class="card" style="background:rgba(255,255,255,.1);border:0;color:#fff"><h3>${f[0]}</h3><p style="color:#cbd5e1">${f[1]}</p></div>`).join('')}</div></div></section>`;
+      return articleFrame('insights', insightsVisual(), content);
+    }
+    function hotspot(k,v){ return `<button class="hotspot ${state.insight===k?'active':''}" onclick="softSet({insight:'${k}'})"><span style="font-size:20px">${v[3]}</span><br><small>${v[0]}</small><strong>${v[1]}</strong></button>`; }
+
+    function related(current){ const tasks=[['credits','Buy Ad Credits online','Billing & Account','Purchase Ad Credits anytime through the Agent Self-Serve Channel.','💳'],['renewal','Renew your agent package','Manage Your Package','Check EB and AM windows and understand renewal paths.','🗓'],['topup','Check your top-up limit','Package Entitlements','Select your package to see top-up limits and pricing.','📊'],['insights','Read listing performance','Data & Insights','Understand impressions, views, leads and price insights.','📈']].filter(t=>t[0]!==current).slice(0,3); return `<section class="section white"><div class="wrap">${sectionTitle('Related actions','Move agents to the next useful task','Replacing passive related articles with action cards keeps the Help Centre focused on completion.')}<div class="grid grid-3">${tasks.map(t=>`<button class="card soft" onclick="setState({page:'${t[0]}'})">${icon(t[4])}<p class="eyebrow" style="margin-top:18px">${t[2]}</p><h3>${t[1]}</h3><p>${t[3]}</p><span class="linkish">Open action →</span></button>`).join('')}</div></div></section>`; }
+    function support(){ return `<section class="section dark" id="support"><div class="wrap"><div class="grid grid-2" style="align-items:center"><div><p class="eyebrow" style="color:#fca5a5">Still need help?</p><h2>Contact PropertyGuru Customer Service</h2><p class="lead" style="color:#cbd5e1;margin-top:18px">The support panel is consistent across article types, so agents always know how to escalate when self-serve help is not enough.</p></div><div class="grid grid-3"><div class="support-card"><h3>☎ Phone</h3><p>+65 6238 5971</p><small>Mon–Fri, 9am–6pm, excluding public holidays</small></div><div class="support-card"><h3>✉ Email</h3><p>custcare@propertyguru.com.sg</p><small>Best for billing records, transaction details, and account queries.</small></div><div class="support-card"><h3>💬 WhatsApp</h3><p>+65 9298 1629</p><small>Mon–Fri, 9am–9pm, excluding public holidays. Message only, reply within 1 working day.</small></div></div></div></div></section>`; }
+
+    function render(scroll=true){
+      document.querySelectorAll('.main-nav button').forEach(b=>b.classList.remove('active'));
+      document.querySelector('.nav-home')?.classList.toggle('active', state.page==='home');
+      if(state.page==='home') app.innerHTML = home();
+      if(state.page==='credits') app.innerHTML = creditsPage();
+      if(state.page==='renewal') app.innerHTML = renewalPage();
+      if(state.page==='topup') app.innerHTML = topupPage();
+      if(state.page==='insights') app.innerHTML = insightsPage();
+      if(scroll) window.scrollTo(0,0);
+    }
+    window.setState = setState;
+    window.softSet = softSet;
+    document.querySelectorAll('[data-page]').forEach(btn=>btn.addEventListener('click',()=>setState({page:btn.dataset.page})));
+    render();
+  </script>
+</body>
+</html>
