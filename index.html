@@ -155,11 +155,35 @@
     .hidden { display:none !important; }
     .footer { background:#fff; border-top:1px solid var(--line); padding:28px 0; color:#64748b; font-size:14px; font-weight:700; }
     .footer .wrap { display:flex; justify-content:space-between; gap:18px; flex-wrap:wrap; }
+
+    .article-layout-wrap { max-width:1240px; margin:0 auto; padding:34px 24px 72px; }
+    .article-shell { display:grid; grid-template-columns:310px minmax(0,1fr); gap:34px; align-items:start; }
+    .article-side-panel { position:sticky; top:96px; align-self:start; max-height:calc(100vh - 118px); overflow:auto; border:1px solid var(--line); background:#fff; border-radius:28px; padding:18px; box-shadow:0 12px 36px rgba(15,23,42,.06); }
+    .article-side-panel::-webkit-scrollbar { width:6px; }
+    .article-side-panel::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:999px; }
+    .side-kicker { display:flex; align-items:center; gap:10px; padding:10px 10px 14px; border-bottom:1px solid var(--line); margin-bottom:14px; }
+    .side-kicker .icon { width:38px; height:38px; border-radius:14px; }
+    .side-kicker strong { display:block; font-size:14px; }
+    .side-kicker span { display:block; color:var(--muted); font-size:12px; font-weight:700; margin-top:2px; }
+    .side-group { margin:18px 0 0; }
+    .side-group:first-of-type { margin-top:0; }
+    .side-group h4 { margin:0 0 8px; font-size:13px; letter-spacing:.02em; }
+    .side-link { width:100%; display:flex; align-items:flex-start; gap:9px; text-align:left; border:0; background:transparent; color:#334155; padding:9px 10px; border-radius:14px; font-size:13px; font-weight:750; line-height:1.35; transition:.18s ease; }
+    .side-link:before { content:'→'; color:var(--red); font-weight:950; margin-top:0; }
+    .side-link:hover { background:#f8fafc; color:var(--red); transform:none; }
+    .side-link.active { background:var(--soft-red); color:var(--red-dark); }
+    .side-link.muted { color:#64748b; }
+    .side-sample { margin:14px 10px 0; border-radius:18px; background:#f8fafc; padding:12px; color:#64748b; font-size:12px; line-height:1.5; font-weight:700; }
+    .article-content { min-width:0; }
+    .article-content .wrap { max-width:100%; padding:0; }
+    .article-content .section { padding:56px 0; }
+    .article-content .section:first-child { padding-top:0; }
+    .article-content .section.white { border-radius:34px; padding:56px 28px; margin:0 0 14px; }
     @media (max-width: 1040px) {
       .searchbar, .main-nav { display:none; }
       .mobile-search { display:block; }
-      .hero-grid, .step-panel, .selector-grid, .discount-layout, .insight-layout { grid-template-columns:1fr; }
-      .sticky-result, .package-detail, .insight-result { position:static; }
+      .hero-grid, .step-panel, .selector-grid, .discount-layout, .insight-layout, .article-shell { grid-template-columns:1fr; }
+      .sticky-result, .package-detail, .insight-result, .article-side-panel { position:static; max-height:none; }
       .grid-4, .grid-5 { grid-template-columns:repeat(2,1fr); }
       .timeline, .metrics, .hotspot-grid { grid-template-columns:1fr; }
       .hotspot-grid.two { grid-template-columns:1fr; }
@@ -266,9 +290,45 @@
       <section class="section white"><div class="wrap">${sectionTitle('All topics','Get support for anything AgentNet','Topic cards are grouped by agent outcome, with quick links to common actions inside each area.')}<div class="grid grid-3">${topics.map(t=>`<div class="topic-card">${icon(t[1])}<h3 style="margin-top:18px">${t[0]}</h3><p style="color:var(--muted);line-height:1.65;margin-top:10px">${t[2]}</p><div style="margin-top:18px">${t[3].map(l=>`<div class="topic-link"><span>${l}</span><span>›</span></div>`).join('')}</div></div>`).join('')}</div></div></section>`;
     }
 
+
+    const sideNavGroups = [
+      { title:'Get Started', items:[
+        ['How to Enable Push Notifications for AgentNet App','home'],
+        ['How to Post a New Listing on AgentNet','home'],
+        ['Login to Your AgentNet Account','home'],
+        ['How to Install the AgentNet App','home']
+      ]},
+      { title:'Manage Your Listings', items:[
+        ['Advertisement and Content Guidelines','home'],
+        ['Upload Photos to Your Property Listing','home'],
+        ['Update Property Location For Landed Property Listing','home'],
+        ['Policy on Porting Listings to Third-Party Platforms','home']
+      ]},
+      { title:'Feedback on Your Listings', items:[
+        ['Understanding the Report Listing Function','home'],
+        ['Listing Suspension','home']
+      ]},
+      { title:'Enhance the Quality of Your Listings', items:[
+        ['Creating an AI Video for Your Listings','home'],
+        ['Write a Description that Sells','home'],
+        ['Requirements for Headlines','home'],
+        ['Understanding PropertyGuru Quality Photos Guide','home']
+      ]},
+      { title:'Sample Article Experiences', items:[
+        ['How To Purchase Credits Online?','credits'],
+        ['Renewing Your Agent Package','renewal'],
+        ['Ad Credits Top Up Limit','topup'],
+        ['Listing Performance Insights','insights']
+      ]}
+    ];
+
+    function articleSideNav(currentPage){
+      return `<aside class="article-side-panel"><div class="side-kicker">${icon('☰')}<div><strong>Browse Help Articles</strong><span>Stay in article mode while moving across help topics</span></div></div>${sideNavGroups.map(group=>`<div class="side-group"><h4>${group.title}</h4>${group.items.map(([label,page])=>`<button class="side-link ${page===currentPage?'active':''} ${page==='home'?'muted':''}" onclick="setState({page:'${page}'})">${label}</button>`).join('')}</div>`).join('')}<div class="side-sample">Note: this prototype fully rebuilds the four sample article experiences. Other links show how the left panel would scale across the live Help Centre library.</div></aside>`;
+    }
+
     function articleFrame(page, visual, content){
       const m = pageMeta[page];
-      return `<section class="hero article-hero"><div class="wrap hero-grid"><div><div class="breadcrumb"><button onclick="setState({page:'home'})">Help Centre</button><span>›</span><span>${m.category}</span></div><div class="pill">✨ ${m.type}</div><p class="eyebrow" style="margin-top:28px">${m.eyebrow}</p><h1>${m.title}</h1><p style="color:#64748b;font-weight:800;margin-bottom:18px">${m.update}</p><p class="lead">${m.intro}</p><div class="cta-row"><button class="primary" onclick="document.querySelector('.after-quick')?.scrollIntoView({behavior:'smooth'})">Start action →</button><button class="secondary" onclick="setState({page:'home'})">Back to Help Centre</button></div></div>${visual}</div></section><div class="wrap"><div class="quick"><div class="quick-grid">${icon('？')}<div><p class="eyebrow">Quick answer</p><strong>${m.quick}</strong><span>Primary intent: ${m.intent}</span></div><div class="pill" style="background:#fff">Action-first guide</div></div></div></div><div class="after-quick"></div>${content}${related(page)}${support()}`;
+      return `<section class="hero article-hero"><div class="wrap hero-grid"><div><div class="breadcrumb"><button onclick="setState({page:'home'})">Help Centre</button><span>›</span><span>${m.category}</span></div><div class="pill">✨ ${m.type}</div><p class="eyebrow" style="margin-top:28px">${m.eyebrow}</p><h1>${m.title}</h1><p style="color:#64748b;font-weight:800;margin-bottom:18px">${m.update}</p><p class="lead">${m.intro}</p><div class="cta-row"><button class="primary" onclick="document.querySelector('.after-quick')?.scrollIntoView({behavior:'smooth'})">Start action →</button><button class="secondary" onclick="setState({page:'home'})">Back to Help Centre</button></div></div>${visual}</div></section><div class="wrap"><div class="quick"><div class="quick-grid">${icon('？')}<div><p class="eyebrow">Quick answer</p><strong>${m.quick}</strong><span>Primary intent: ${m.intent}</span></div><div class="pill" style="background:#fff">Action-first guide</div></div></div></div><div class="article-layout-wrap after-quick"><div class="article-shell">${articleSideNav(page)}<article class="article-content">${content}</article></div></div>${related(page)}${support()}`;
     }
 
     function creditsVisual(){ return browser(`<div style="display:flex;justify-content:space-between"><div><p class="eyebrow">Billing</p><h3>Purchase Ad Credits</h3></div>${icon('💳')}</div><div class="grid grid-3" style="margin-top:22px">${['300','600','1,000'].map((a,i)=>`<div class="card" style="padding:16px;${i==1?'background:var(--soft-red);border-color:#fecaca':''}"><strong style="font-size:30px">${a}</strong><p>Ad Credits</p><div style="height:36px;border-radius:14px;background:${i==1?'var(--red)':'#f1f5f9'};margin-top:14px"></div></div>`).join('')}</div><div class="card" style="margin-top:18px;background:var(--soft-red);border-style:dashed"><strong>✨ Apply promo code at checkout</strong></div>`,'AgentNet / Self-Serve Channel'); }
